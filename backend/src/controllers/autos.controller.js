@@ -6,8 +6,7 @@ import {
   updateAutoService,
 } from "../services/auto.service.js";
 import {
-  userBodyValidation,
-  userQueryValidation,
+  autoQueryValidation,
 } from "../validations/auto.validation.js";
 import {
   handleErrorClient,
