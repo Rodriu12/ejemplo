@@ -4,10 +4,7 @@ import {
   getAutoService,
   getAutosService,
   updateAutoService,
-} from "../services/auto.service.js";
-import {
-  autoQueryValidation,
-} from "../validations/auto.validation.js";
+} from "../services/autos.service.js";
 import {
   handleErrorClient,
   handleErrorServer,
@@ -16,11 +13,7 @@ import {
 
 export async function getAuto(req, res) {
   try {
-    const { patente, marca, año } = req.query;
-
-    const { error } = autoQueryValidation.validate({ patente, marca, año });
-
-    if (error) return handleErrorClient(res, 400, error.message);
+    const { patente, marca, año } = req.autoQuery;
 
     const [auto, errorAuto] = await getAutoService({ patente, marca, año });
 
@@ -52,33 +45,8 @@ export async function getAutos(req, res) {
 
 export async function updateAuto(req, res) {
   try {
-    const { patente, marca, año } = req.query;
+    const { patente, marca, año } = req.autoQuery;
     const { body } = req;
-
-    const { error: queryError } = autoQueryValidation.validate({
-      patente,
-      marca,
-      año,
-    });
-
-    if (queryError) {
-      return handleErrorClient(
-        res,
-        400,
-        "Error de validación en la consulta",
-        queryError.message,
-      );
-    }
-
-    const { error: bodyError } = autoBodyValidation.validate(body);
-
-    if (bodyError)
-      return handleErrorClient(
-        res,
-        400,
-        "Error de validación en los datos enviados",
-        bodyError.message,
-      );
 
     const [auto, autoError] = await updateAutoService({ patente, marca, año }, body);
 
@@ -92,22 +60,7 @@ export async function updateAuto(req, res) {
 
 export async function deleteAutos(req, res) {
   try {
-    const { patente, marca, año } = req.query;
-
-    const { error: queryError } = autoQueryValidation.validate({
-      patente,
-      marca,
-      año,
-    });
-
-    if (queryError) {
-      return handleErrorClient(
-        res,
-        400,
-        "Error de validación en la consulta",
-        queryError.message,
-      );
-    }
+    const { patente, marca, año } = req.autoQuery;
 
     const [autoDelete, errorAutoDelete] = await deleteAutoService({
       patente,
@@ -116,6 +69,20 @@ export async function deleteAutos(req, res) {
     });
 
     if (errorAutoDelete) return handleErrorClient(res, 404, "Error eliminado el auto", errorAutoDelete);
+
+    handleSuccess(res, 200, "Auto eliminado correctamente", autoDelete);
+  } catch (error) {
+    handleErrorServer(res, 500, error.message);
+  }
+}
+
+export async function deleteAuto(req, res) {
+  try {
+    const [autoDelete, errorAutoDelete] = await deleteAutoService(req.autoQuery);
+
+    if (errorAutoDelete) {
+      return handleErrorClient(res, 404, "Error al eliminar el auto", errorAutoDelete);
+    }
 
     handleSuccess(res, 200, "Auto eliminado correctamente", autoDelete);
   } catch (error) {

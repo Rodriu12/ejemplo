@@ -1,13 +1,12 @@
 "use strict";
-import User from "../entity/autos.entity.js";
+import Auto from "../entity/autos.entity.js";
 import { AppDataSource } from "../config/configDb.js";
-import { comparePassword, encryptPassword } from "../helpers/bcrypt.helper.js";
 
 export async function getAutoService(query) {
   try {
     const { patente, marca, año } = query;
 
-    const AutoRepository = AppDataSource.getRepository(Auto);
+    const autoRepository = AppDataSource.getRepository(Auto);
 
     const autoFound = await autoRepository.findOne({
       where: [{ patente: patente }, { marca: marca }, { año: año }],
@@ -15,7 +14,8 @@ export async function getAutoService(query) {
 
     if (!autoFound) return [null, "Auto no encontrado"];
 
-    const { patente, ...autoData } = autoFound;
+    const autoData = { ...autoFound };
+    delete autoData.patente;
 
     return [autoData, null];
   } catch (error) {
@@ -53,40 +53,22 @@ export async function updateAutoService(query, body) {
 
     if (!autoFound) return [null, "Auto no encontrado"];
 
-    const existingAuto = await autoRepository.findOne({
-      where: [{ patente: body.patente }],
-    });
-
-    if (existingAuto && existingAuto.patente !== autoFound.patente) {
-      return [null, "Ya existe un auto con la misma patente"];
-    }
-
-    if (body.patente) {
-      const matchPatente = await comparePatente(
-        body.patente,
-        userFound.patente,
-      );
-
-      if (!matchPatente) return [null, "La patente no coincide"];
-    }
-
     const dataAutoUpdate = {
-      marca: body.marca,
-      año: body.año,
+      ...(body.marca !== undefined && { marca: body.marca }),
+      ...(body.año !== undefined && { año: body.año }),
       updatedAt: new Date(),
     };
 
     await autoRepository.update({ patente: autoFound.patente }, dataAutoUpdate);
 
-    const userData = await userRepository.findOne({
-      where: { patente: autoFound.patente },
+    const autoUpdatedData = await autoRepository.findOneBy({
+      patente: autoFound.patente,
     });
 
-    if (!userData) {
-      return [null, "Auto no encontrado después de actualizar"];
-    }
+    if (!autoUpdatedData) return [null, "Auto no encontrado después de actualizar"];
 
-    const { patente, ...autoUpdated } = autoData;
+    const autoUpdated = { ...autoUpdatedData };
+    delete autoUpdated.patente;
 
     return [autoUpdated, null];
   } catch (error) {
@@ -109,7 +91,8 @@ export async function deleteAutoService(query) {
 
     const autoDeleted = await autoRepository.remove(autoFound);
 
-    const { patente, ...dataAuto } = autoDeleted;
+    const dataAuto = { ...autoDeleted };
+    delete dataAuto.patente;
 
     return [dataAuto, null];
   } catch (error) {

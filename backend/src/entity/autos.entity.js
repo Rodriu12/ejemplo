@@ -32,23 +32,6 @@ const UserSchema = new EntitySchema({
       nullable: false,
     },
   },
-  indices: [
-    {
-      name: "IDX_USER",
-      columns: ["id"],
-      unique: true,
-    },
-    {
-      name: "IDX_USER_RUT",
-      columns: ["rut"],
-      unique: true,
-    },
-    {
-      name: "IDX_USER_EMAIL",
-      columns: ["email"],
-      unique: true,
-    },
-  ],
 });
 
 export default UserSchema;
