@@ -3,6 +3,10 @@ import { Router } from "express";
 import { isAdmin } from "../middlewares/authorization.middleware.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 import {
+  validateAutoBody,
+  validateAutoQuery,
+} from "../middlewares/auto.middleware.js";
+import {
   deleteAuto,
   deleteAutos,
   getAuto,
@@ -18,9 +22,9 @@ router
 
 router
   .get("/auto/", getAutos)
-  .get("/auto/:patente", getAuto)
-  .patch("/auto/marca/:patente", updateAuto)
-  .delete("/auto/", deleteAutos)
-  .delete("/auto/:patente", deleteAuto);
+  .get("/auto/:patente", validateAutoQuery, getAuto)
+  .patch("/auto/marca/:patente", validateAutoQuery, validateAutoBody, updateAuto)
+  .delete("/auto/", validateAutoQuery, deleteAutos)
+  .delete("/auto/:patente", validateAutoQuery, deleteAuto);
 
 export default router;

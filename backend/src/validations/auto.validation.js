@@ -40,3 +40,18 @@ export const autoQueryValidation = Joi.object({
     "object.unknown": "No se permiten propiedades adicionales.",
     "object.missing": "Debes proporcionar al menos un parámetro: patente, marca o año.",
 });
+
+export const autoBodyValidation = Joi.object({
+    patente: Joi.string()
+    .min(5)
+    .max(7)
+    .pattern(/^(?:[B-DF-HJ-NP-TV-Z]{4}[-\s]?\d{2}|[A-Z]{2}[-\s]?\d{4})$/i),
+    marca: Joi.string().min(10).max(20),
+    año: Joi.number().integer().positive(),
+})
+    .min(1)
+    .unknown(false)
+    .messages({
+    "object.unknown": "No se permiten propiedades adicionales.",
+    "object.min": "Debes proporcionar al menos un campo para actualizar.",
+});
