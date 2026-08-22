@@ -1,14 +1,14 @@
 "use strict";
 import {
-  deleteUserService,
-  getUserService,
-  getUsersService,
-  updateUserService,
-} from "../services/user.service.js";
+  deleteAutoService,
+  getAutoService,
+  getAutosService,
+  updateAutoService,
+} from "../services/auto.service.js";
 import {
   userBodyValidation,
   userQueryValidation,
-} from "../validations/user.validation.js";
+} from "../validations/auto.validation.js";
 import {
   handleErrorClient,
   handleErrorServer,
