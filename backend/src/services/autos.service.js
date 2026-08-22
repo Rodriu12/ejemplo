@@ -3,127 +3,117 @@ import User from "../entity/autos.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import { comparePassword, encryptPassword } from "../helpers/bcrypt.helper.js";
 
-export async function getUserService(query) {
+export async function getAutoService(query) {
   try {
     const { patente, marca, año } = query;
 
-    const userRepository = AppDataSource.getRepository(User);
+    const AutoRepository = AppDataSource.getRepository(Auto);
 
-    const userFound = await userRepository.findOne({
-      where: [{ id: id }, { rut: rut }, { email: email }],
+    const autoFound = await autoRepository.findOne({
+      where: [{ patente: patente }, { marca: marca }, { año: año }],
     });
 
-    if (!userFound) return [null, "Usuario no encontrado"];
+    if (!autoFound) return [null, "Auto no encontrado"];
 
-    const { password, ...userData } = userFound;
+    const { patente, ...autoData } = autoFound;
 
-    return [userData, null];
+    return [autoData, null];
   } catch (error) {
-    console.error("Error obtener el usuario:", error);
+    console.error("Error obtener el auto:", error);
     return [null, "Error interno del servidor"];
   }
 }
 
-export async function getUsersService() {
+export async function getAutosService() {
   try {
-    const userRepository = AppDataSource.getRepository(User);
+    const autoRepository = AppDataSource.getRepository(Auto);
 
-    const users = await userRepository.find();
+    const autos = await autoRepository.find();
 
-    if (!users || users.length === 0) return [null, "No hay usuarios"];
+    if (!autos || autos.length === 0) return [null, "No hay autos"];
 
-    const usersData = users.map(({ password, ...user }) => user);
+    const autosData = autos.map(({ patente, ...auto }) => auto);
 
-    return [usersData, null];
+    return [autosData, null];
   } catch (error) {
-    console.error("Error al obtener a los usuarios:", error);
+    console.error("Error al obtener los autos:", error);
     return [null, "Error interno del servidor"];
   }
 }
 
-export async function updateUserService(query, body) {
+export async function updateAutoService(query, body) {
   try {
-    const { id, rut, email } = query;
+    const { patente, marca, año } = query;
 
-    const userRepository = AppDataSource.getRepository(User);
+    const autoRepository = AppDataSource.getRepository(Auto);
 
-    const userFound = await userRepository.findOne({
-      where: [{ id: id }, { rut: rut }, { email: email }],
+    const autoFound = await autoRepository.findOne({
+      where: [{ patente: patente }, { marca: marca }, { año: año }],
     });
 
-    if (!userFound) return [null, "Usuario no encontrado"];
+    if (!autoFound) return [null, "Auto no encontrado"];
 
-    const existingUser = await userRepository.findOne({
-      where: [{ rut: body.rut }, { email: body.email }],
+    const existingAuto = await autoRepository.findOne({
+      where: [{ patente: body.patente }],
     });
 
-    if (existingUser && existingUser.id !== userFound.id) {
-      return [null, "Ya existe un usuario con el mismo rut o email"];
+    if (existingAuto && existingAuto.patente !== autoFound.patente) {
+      return [null, "Ya existe un auto con la misma patente"];
     }
 
-    if (body.password) {
-      const matchPassword = await comparePassword(
-        body.password,
-        userFound.password,
+    if (body.patente) {
+      const matchPatente = await comparePatente(
+        body.patente,
+        userFound.patente,
       );
 
-      if (!matchPassword) return [null, "La contraseña no coincide"];
+      if (!matchPatente) return [null, "La patente no coincide"];
     }
 
-    const dataUserUpdate = {
-      nombreCompleto: body.nombreCompleto,
-      rut: body.rut,
-      email: body.email,
-      rol: body.rol,
+    const dataAutoUpdate = {
+      marca: body.marca,
+      año: body.año,
       updatedAt: new Date(),
     };
 
-    if (body.newPassword && body.newPassword.trim() !== "") {
-      dataUserUpdate.password = await encryptPassword(body.newPassword);
-    }
-
-    await userRepository.update({ id: userFound.id }, dataUserUpdate);
+    await autoRepository.update({ patente: autoFound.patente }, dataAutoUpdate);
 
     const userData = await userRepository.findOne({
-      where: { id: userFound.id },
+      where: { patente: autoFound.patente },
     });
 
     if (!userData) {
-      return [null, "Usuario no encontrado después de actualizar"];
+      return [null, "Auto no encontrado después de actualizar"];
     }
 
-    const { password, ...userUpdated } = userData;
+    const { patente, ...autoUpdated } = autoData;
 
-    return [userUpdated, null];
+    return [autoUpdated, null];
   } catch (error) {
-    console.error("Error al modificar un usuario:", error);
+    console.error("Error al modificar un auto:", error);
     return [null, "Error interno del servidor"];
   }
 }
 
-export async function deleteUserService(query) {
+export async function deleteAutoService(query) {
   try {
-    const { id, rut, email } = query;
+    const { patente, marca, año } = query;
 
-    const userRepository = AppDataSource.getRepository(User);
+    const autoRepository = AppDataSource.getRepository(Auto);
 
-    const userFound = await userRepository.findOne({
-      where: [{ id: id }, { rut: rut }, { email: email }],
+    const autoFound = await autoRepository.findOne({
+      where: [{ patente: patente }, { marca: marca }, { año: año }],
     });
 
-    if (!userFound) return [null, "Usuario no encontrado"];
+    if (!autoFound) return [null, "Auto no encontrado"];
 
-    if (userFound.rol === "administrador") {
-      return [null, "No se puede eliminar un usuario con rol de administrador"];
-    }
+    const autoDeleted = await autoRepository.remove(autoFound);
 
-    const userDeleted = await userRepository.remove(userFound);
+    const { patente, ...dataAuto } = autoDeleted;
 
-    const { password, ...dataUser } = userDeleted;
-
-    return [dataUser, null];
+    return [dataAuto, null];
   } catch (error) {
-    console.error("Error al eliminar un usuario:", error);
+    console.error("Error al eliminar un auto:", error);
     return [null, "Error interno del servidor"];
   }
 }
