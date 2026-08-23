@@ -4,7 +4,7 @@ import Joi from "joi";
 export const autoQueryValidation = Joi.object({
     patente: Joi.string()
     .min(1)
-    .max(7)
+    .max(10)
     .pattern(/^(?:[B-DF-HJ-NP-TV-Z]{4}[-\s]?\d{2}|[A-Z]{2}[-\s]?\d{4})$/i)
     .messages({
         "string.empty":"La patente no debe estar vacía.",
