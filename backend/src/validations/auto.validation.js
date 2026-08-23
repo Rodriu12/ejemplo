@@ -15,7 +15,7 @@ export const autoQueryValidation = Joi.object({
     }),
     marca: Joi.string()
     .min(10)
-    .max(20)
+    .max(100)
     .messages({
         "string.empty":"La patente no debe estar vacía.",
         "string.base":"La marca debe ser un string.",
