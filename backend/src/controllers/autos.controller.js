@@ -52,7 +52,7 @@ export async function updateAuto(req, res) {
 
     if (autoError) return handleErrorClient(res, 400, "Error modificando el auto", autoError);
 
-    handleSuccess(res, 200, "Usuario modificado correctamente", auto);
+    handleSuccess(res, 200, "Auto modificado correctamente", auto);
   } catch (error) {
     handleErrorServer(res, 500, error.message);
   }
