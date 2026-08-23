@@ -46,7 +46,7 @@ export const autoBodyValidation = Joi.object({
     .min(5)
     .max(7)
     .pattern(/^(?:[B-DF-HJ-NP-TV-Z]{4}[-\s]?\d{2}|[A-Z]{2}[-\s]?\d{4})$/i),
-    marca: Joi.string().min(10).max(20),
+    marca: Joi.string().min(10).max(100),
     año: Joi.number().integer().positive(),
 })
     .min(1)
