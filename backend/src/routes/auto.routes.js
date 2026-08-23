@@ -8,7 +8,6 @@ import {
 } from "../middlewares/auto.middleware.js";
 import {
   deleteAuto,
-  deleteAutos,
   getAuto,
   getAutos,
   updateAuto,
@@ -24,7 +23,6 @@ router
   .get("/auto/", getAutos)
   .get("/auto/:patente", validateAutoQuery, getAuto)
   .patch("/auto/marca/:patente", validateAutoQuery, validateAutoBody, updateAuto)
-  .delete("/auto/", validateAutoQuery, deleteAutos)
   .delete("/auto/:patente", validateAutoQuery, deleteAuto);
 
 export default router;
