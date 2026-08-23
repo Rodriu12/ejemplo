@@ -22,7 +22,7 @@ router
 router
   .get("/auto/", getAutos)
   .get("/auto/:patente", validateAutoQuery, getAuto)
-  .patch("/auto/marca/:patente", validateAutoQuery, validateAutoBody, updateAuto)
+  .patch("/auto/", validateAutoQuery, validateAutoBody, updateAuto)
   .delete("/auto/:patente", validateAutoQuery, deleteAuto);
 
 export default router;
